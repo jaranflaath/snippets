@@ -1,6 +1,6 @@
 # Gradle
 
-* [Bundle/APK signing](#Bundle_APK_signing)
+* [Bundle/APK signing](#bundleapk-signing)
 
 ## Bundle/APK signing
 

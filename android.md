@@ -40,31 +40,47 @@ override fun onStart() {
 A simple message bus for communicating between activities, services and fragments in your app. 
 
 ```kotlin
-import android.os.Handler
-import android.os.Looper
-import androidx.lifecycle.LifecycleOwner
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.Observer
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.channels.BroadcastChannel
+import kotlinx.coroutines.channels.ReceiveChannel
+import kotlinx.coroutines.launch
+import kotlin.coroutines.CoroutineContext
 
 sealed class Message
-object MyCustomMessage : Message()
+class MyMessage : Message()
 
-object MessageBus {
+object MessageBus : CoroutineScope {
 
-    private val bus = MutableLiveData<Message>()
+    private val bus = BroadcastChannel<Message>(1)
 
+    @OptIn(ExperimentalCoroutinesApi::class)
     fun <T : Message> publish(message: T) {
-        Handler(Looper.getMainLooper()).post {
-            bus.setValue(message)
-        }
+        launch { bus.send(message) }
     }
 
-    fun observe(lifecycleOwner: LifecycleOwner, callback: (Message?) -> Unit) {
-        bus.observe(lifecycleOwner, Observer { callback(bus.value) })
-    }
+    @OptIn(ExperimentalCoroutinesApi::class)
+    fun observe(): ReceiveChannel<Message> =
+        bus.openSubscription()
+
+    override val coroutineContext: CoroutineContext
+        get() = Dispatchers.Default
 
 }
 
 ```
-_Thanks to [Christopher Dambakk](https://github.com/Dambakk) for improvements_
+
+To subscribe to messages, use the following code: 
+
+```kotlin
+launch {
+    messageCollector = MessageBus.observe()
+    messageCollector.receiveAsFlow().filter { it is MyMessage }.collect {
+        // Do something
+    }
+}
+```
+
+Remember to unsubscribe from the `messageCollector` in your `onDestroy` method by calling `messageCollector.cancel()`
 

@@ -51,24 +51,26 @@ import kotlin.coroutines.CoroutineContext
 sealed class Message
 class MyMessage : Message()
 
+@ExperimentalCoroutinesApi
 object MessageBus : CoroutineScope {
 
     private val bus = BroadcastChannel<Message>(1)
 
-    @OptIn(ExperimentalCoroutinesApi::class)
     fun <T : Message> publish(message: T) {
         launch { bus.send(message) }
     }
 
-    @OptIn(ExperimentalCoroutinesApi::class)
-    fun observe(): ReceiveChannel<Message> =
-        bus.openSubscription()
+    fun observe(): Flow<Message> =
+        bus.openSubscription().receiveAsFlow()
+
+    fun <T: Message> observe(messageClass: KClass<T>): Flow<T> {
+        return bus.openSubscription().receiveAsFlow().filter { it::class == messageClass } as Flow<T>
+    }
 
     override val coroutineContext: CoroutineContext
         get() = Dispatchers.Default
 
 }
-
 ```
 
 To subscribe to messages, use the following code: 

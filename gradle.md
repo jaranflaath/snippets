@@ -5,11 +5,17 @@
 
 ## AppCenter distribution
 ```groovy
-plugins {
-    ...
-    id "com.betomorrow.appcenter" version "1.2.1"
-}
+buildscript {
+    repositories {
+        maven {
+            url "https://plugins.gradle.org/m2/"
+        }
+    }
 
+    dependencies {
+        classpath "gradle.plugin.com.betomorrow.gradle:appcenter-plugin:1.2.1"
+    }
+}
 appcenter {
     apiToken = "api-token-created-from-any-user"
     ownerName = "owner/org"

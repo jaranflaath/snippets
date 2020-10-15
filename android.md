@@ -32,6 +32,20 @@ override fun onStart() {
     }
 }
 ```
+#### Rounded corners
+
+```
+<style name="AppBottomSheetDialogTheme"
+    parent="Theme.Design.Light.BottomSheetDialog">
+    <item name="bottomSheetStyle">@style/AppModalStyle</item>
+</style>
+<style name="AppModalStyle"
+    parent="Widget.Design.BottomSheet.Modal">
+    <item name="android:background">@drawable/rounded_top_corners_20</item>
+</style>
+```
+
+then set `<item name="bottomSheetDialogTheme">@style/AppBottomSheetDialogTheme</item>` on your app theme.
 
 ## Messaging
 

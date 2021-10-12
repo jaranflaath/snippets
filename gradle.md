@@ -2,6 +2,7 @@
 
 * [AppCenter distribution](#appcenter-distribution)
 * [Bundle/APK signing](#bundleapk-signing)
+* [Include build / replace dependency](#include-build-and-dependency-substitution)
 
 ## AppCenter distribution
 ```groovy
@@ -59,4 +60,16 @@ android {
     }
 }
 
+```
+
+## Include build and dependency substitution
+
+During development, replace a dependency by including a local build for faster debugging and modifications.
+
+```
+includeBuild("/path/to/another/build") {
+    dependencySubstitution {
+        substitute module('group.id:artifact') with project(':module-from-another-build')
+    }
+}
 ```

@@ -3,6 +3,7 @@
 * [AppCenter distribution](#appcenter-distribution)
 * [Bundle/APK signing](#bundleapk-signing)
 * [Include build / replace dependency](#include-build-and-dependency-substitution)
+* [Set release priority with Play Publisher Plugin](#set-release-priority-with-play-publisher-plugin)
 
 ## AppCenter distribution
 ```groovy
@@ -71,5 +72,29 @@ includeBuild("/path/to/another/build") {
     dependencySubstitution {
         substitute module('group.id:artifact') with project(':module-from-another-build')
     }
+}
+```
+
+## Set release priority with Play Publisher Plugin
+
+The following configuration for the [Gradle Play Publisher Plugin](https://github.com/Triple-T/gradle-play-publisher) enables setting of the priority for a specific version name via gradle.properties. 
+
+If the release should have a priorty other than default, simply set the `google_play.1.0.priority=3` to set priority for version 1.0 to 3.
+```
+play {
+    defaultToAppBundles.set(true)
+    track.set("internal")
+
+    def googlePlayUpdatePriority = project.properties["google_play.${project.android.defaultConfig.versionName}.priority"]
+    if (googlePlayUpdatePriority != null) {
+        updatePriority.set(Integer.parseInt(googlePlayUpdatePriority))
+    }
+
+    def serviceAccountFile = project.properties["serviceAccountFile"]
+    if (serviceAccountFile == null) {
+        serviceAccountFile = "gradle-play-publishing.json"
+    }
+
+    serviceAccountCredentials.set(file(serviceAccountFile))
 }
 ```
